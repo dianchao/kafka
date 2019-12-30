@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 初始化生产者 -->
+    <bean name="productConfig" class="com.system.kafka.clients.model.ProductConfig">
+        <property name="bootstrapServers" value="10.0.21.56:9092,10.0.21.57:9092"/>
+        <property name="acks" value="all"/>
+        <property name="retries" value="0"/>
+        <property name="batchSize" value="16384"/>
+        <property name="bufferMemory" value="33554432"/>
+        <!-- 可根据自己需要填写,也可用默认配置 -->
+        <property name="minIdle" value="1"/>
+        <property name="maxIdle" value="1"/>
+        <property name="maxTotal" value="10"/>
+        <!--<property name="maxWaitMillis" value="30000"/>-->
+        <property name="jmxEnabled" value="false"/>
+    </bean>
+
+    <bean name="producerConnPool" class="com.system.kafka.clients.factory.ProducerConnPool">
+        <constructor-arg ref="productConfig"/>
+    </bean>
+
+    <bean name="normalRoundRobin" class="com.system.kafka.clients.factory.NormalRoundRobin">
+        <constructor-arg name="producerConnPool" ref="producerConnPool"/>
+    </bean>
+
+    <bean name="productService" class="com.system.kafka.clients.ProductService">
+        <property name="NormalRoundRobin" ref="normalRoundRobin"/>
+        <property name="block" value="false"/>
+    </bean>
+
+    <!-- 生产通道1 -->
+    <bean name="producerHandler" class="com.system.kafka.clients.handle.ProducerHandler">
+        <property name="productService" ref="productService"/>
+        <property name="topicName" value="CREDIT-GW-BANKCARD-UNIFY-FEE-TEST-FIVE"/>
+        <!--<property name="topicName" value="my-topic-1"/>-->
+    </bean>
+
+    <!-- 生产通道2 -->
+    <bean name="producerHandler2" class="com.system.kafka.clients.handle.ProducerHandler">
+        <property name="productService" ref="productService"/>
+        <property name="topicName" value="my-topic-2"/>
+    </bean>
+
+    <!--初始化消费者 -->
+    <!--<bean name="consumerConfig" class="com.system.kafka.clients.model.ConsumerConfig">-->
+        <!--<property name="bootstrapServers" value="10.0.21.56:9092,10.0.21.57:9092"/>-->
+        <!--<property name="groupId" value="testGroup"/>-->
+        <!--<property name="enableAutoCommit" value="true"/>-->
+        <!--<property name="autoCommitIntervalMs" value="1000"/>-->
+        <!--<property name="sessionTimeoutMs" value="30000"/>-->
+    <!--</bean>-->
+
+    <!--<bean name="consumerFactory" class="com.system.kafka.clients.factory.ConsumerFactory">-->
+        <!--<constructor-arg ref="consumerConfig"/>-->
+    <!--</bean>-->
+
+    <!--<bean name="consumerServiceImpl" class="com.system.kafka.clients.ConsumerService" destroy-method="destroy">-->
+        <!--<property name="consumerFactory" ref="consumerFactory"/>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash; 通过注解的形式,提供的消费者实例 &ndash;&gt;-->
+    <!--<context:component-scan base-package="com.system.kafka.clients.demo"/>-->
+
+    <!--<bean name="consumerHandler" class="com.system.kafka.clients.handle.ConsumerHandler" init-method="execute">-->
+        <!--<property name="consumerService" ref="consumerServiceImpl"/>-->
+        <!--<property name="topicName" value="my-topic-1"/>-->
+        <!--&lt;!&ndash; 消息传输对象 &ndash;&gt;-->
+        <!--<property name="transObj" value="com.system.kafka.clients.demo.SayHello"/>-->
+        <!--&lt;!&ndash; 注入消息处理类对象 (需要你来进行扫描) &ndash;&gt;-->
+        <!--<property name="receiptObj" ref="receiptDispatch"/>-->
+    <!--</bean>-->
+
+    <!--<bean name="consumerHandler2" class="com.system.kafka.clients.handle.ConsumerHandler" init-method="execute">-->
+        <!--<property name="consumerService" ref="consumerServiceImpl"/>-->
+        <!--<property name="topicName" value="my-topic-1"/>-->
+        <!--&lt;!&ndash; 消息传输对象 &ndash;&gt;-->
+        <!--<property name="transObj" value="com.system.kafka.clients.demo.SayHello"/>-->
+        <!--&lt;!&ndash; 注入消息处理类对象 (需要你来进行扫描) &ndash;&gt;-->
+        <!--<property name="receiptObj" ref="receiptDispatch"/>-->
+    <!--</bean>-->
+
+</beans>
