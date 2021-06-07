@@ -18,7 +18,7 @@
         <junit.version>4.11</junit.version>
         <!-- Log libs -->
         <slf4j_version>1.7.10</slf4j_version>
-        <logback_version>1.1.2</logback_version>
+        <logback_version>1.2.0</logback_version>
         <!-- spring test -->
         <spring.version>4.2.4.RELEASE</spring.version>
     </properties>
